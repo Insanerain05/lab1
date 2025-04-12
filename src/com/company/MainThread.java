@@ -2,17 +2,18 @@ package com.company;
 
 public class MainThread extends Thread {
     private final int id;
-    private final BreakThread breakThread;
     private final int step;
+    private final BreakThread breakThread;
 
-    public MainThread(int id, BreakThread breakThread, int step) {
+    public MainThread(int id, int step, BreakThread breakThread) {
         this.id = id;
-        this.breakThread = breakThread;
         this.step = step;
+        this.breakThread = breakThread;
     }
 
     @Override
     public void run() {
+        long startTime = System.currentTimeMillis();
         long sum = 0;
         int count = 0;
         int value = 0;
@@ -21,8 +22,17 @@ public class MainThread extends Thread {
             sum += value;
             value += step;
             count++;
+
+            try {
+                Thread.sleep(1);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
 
-        System.out.println("Потік " + id + ": Сума = " + sum + ", Доданків = " + count);
+        long endTime = System.currentTimeMillis();
+        long duration = endTime - startTime;
+
+        System.out.println("Потік " + id + ": Сума = " + sum + ", Доданків = " + count + ", Час = " + duration + " мс");
     }
 }

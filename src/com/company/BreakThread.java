@@ -1,5 +1,6 @@
 package com.company;
 
+import java.util.Arrays;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class BreakThread implements Runnable {
@@ -14,11 +15,17 @@ public class BreakThread implements Runnable {
 
     @Override
     public void run() {
+        ThreadDelay[] threadDelays = new ThreadDelay[threadIds.length];
         for (int i = 0; i < threadIds.length; i++) {
-            int threadId = threadIds[i];
-            int delay = delays[i];
+            threadDelays[i] = new ThreadDelay(threadIds[i], delays[i]);
+        }
+
+        Arrays.sort(threadDelays);
+
+        for (ThreadDelay threadDelay : threadDelays) {
+            int threadId = threadDelay.id;
             try {
-                Thread.sleep(delay);
+                Thread.sleep(threadDelay.delay);
                 canBreakMap.put(threadId, true);
             } catch (InterruptedException e) {
                 e.printStackTrace();
@@ -28,5 +35,20 @@ public class BreakThread implements Runnable {
 
     public boolean isCanBreak(int id) {
         return canBreakMap.getOrDefault(id, false);
+    }
+
+    private static class ThreadDelay implements Comparable<ThreadDelay> {
+        private final int id;
+        private final int delay;
+
+        public ThreadDelay(int id, int delay) {
+            this.id = id;
+            this.delay = delay;
+        }
+
+        @Override
+        public int compareTo(ThreadDelay o) {
+            return Integer.compare(this.delay, o.delay);
+        }
     }
 }
